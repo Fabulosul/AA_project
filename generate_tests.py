@@ -90,10 +90,10 @@ def generate_tests():
         
     # ]
     test_cases = []
-    for i in range(10, 15):
+    for i in range(1, 11):
         
-        test_cases.append(("test" + f"{i - 9}" + "_stress", i, generate_random_graph(i, 0.2)))
-
+        #test_cases.append(("test" + f"{i}" + "_stress", i, generate_random_graph(i, 0.2)))
+        test_cases.append(("test" + f"{i}" + "_stress", i, generate_complete_graph(i)))
     for name, nodes, edges in test_cases:
         file_name = f"tests/{name}.in"
         generate_test(file_name, nodes, edges)

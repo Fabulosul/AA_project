@@ -54,7 +54,7 @@ def process_test_directory(directory):
                 exec_time, result = measure_time(wp_coloring, graph)
                 status = "PASSED" if result else "FAILED"
                 print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
-                results.append((filename, i + 1, "Welsh-Powell", exec_time, status, num_nodes, num_edges))
+                results.append((filename, i + 1, "Welsh-Powell", exec_time, status, num_nodes, num_edges, result))
             
             # Greedy
             graphs_greedy, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_greedy)
@@ -63,7 +63,7 @@ def process_test_directory(directory):
                 exec_time, result = measure_time(greedy_coloring, graph)
                 status = "PASSED" if result else "FAILED"
                 print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
-                results.append((filename, i + 1, "Greedy", exec_time, status, num_nodes, num_edges))
+                results.append((filename, i + 1, "Greedy", exec_time, status, num_nodes, num_edges, result))
             
             # Backtracking
             graphs_backtracking, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_backtracking)
@@ -72,7 +72,7 @@ def process_test_directory(directory):
                 exec_time, result = measure_time(backtracking_coloring, graph)
                 status = "PASSED" if result else "FAILED"
                 print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
-                results.append((filename, i + 1, "Backtracking", exec_time, status, num_nodes, num_edges))
+                results.append((filename, i + 1, "Backtracking", exec_time, status, num_nodes, num_edges, result))
 
     return results
 
@@ -171,9 +171,9 @@ if __name__ == "__main__":
         # Save sorted results to a summary file
         summary_file = os.path.join(results_directory, "results_summary.txt")
         with open(summary_file, "w") as output_file:
-            output_file.write("Filename,Algorithm,Nodes,Edges,Colors,Execution Time (s),Status\n")
-            for filename, test_num, algorithm, exec_time, status, num_nodes, num_edges in results:
-                output_file.write(f"{filename} | {algorithm} | {num_nodes} | {num_edges} | {exec_time:.12f} | {status}\n")
+            output_file.write("Filename,Algorithm,Nodes,Edges,Execution Time (s),Status,Colors\n")
+            for filename, test_num, algorithm, exec_time, status, num_nodes, num_edges, colors in results:
+                output_file.write(f"{filename} | {algorithm} | {num_nodes} | {num_edges} | {exec_time:.12f} | {status} | {colors}\n")
         print(f"\nResults summary saved to {summary_file}")
 
         # Save organized results by algorithm

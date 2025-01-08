@@ -72,10 +72,12 @@ class Plots():
 
         df = pd.read_csv(file_path)
         columns_needed = ["Nodes + Edges", "Execution Time (s)"]
+        #columns_needed = ["Edges", "Execution Time (s)"]
         data = df[columns_needed]
-    
+
         sns.lineplot(data=data, x="Nodes + Edges", y="Execution Time (s)",
                      marker="o", color=my_color, label=my_label)
-
+        #sns.lineplot(data=data, x="Edges", y="Execution Time (s)",
+        #             marker="o", color=my_color, label=my_label)
 
 __all__ = ['Plots', 'all_paths']
