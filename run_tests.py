@@ -2,8 +2,8 @@ import time
 import os
 import shutil
 from colorama import init, Fore, Style
-from algorithms.welsh_powell_graph_coloring import add_edge as add_edge_wp, graph_coloring as wp_coloring
-from algorithms.greedy_graph_coloring import addEdge as add_edge_greedy, greedyColoring as greedy_coloring
+from algorithms.welsh_powell_graph_coloring import add_edge as add_edge_wp, graph_coloring_welsh_powell as wp_coloring
+from algorithms.greedy_graph_coloring import add_edge as add_edge_greedy, greedy_coloring as greedy_coloring
 from algorithms.backtracking_graph_coloring import add_edge as add_edge_backtracking, graph_colouring as backtracking_coloring
 
 # Initialize colorama
@@ -77,7 +77,7 @@ def process_test_directory(directory):
                 status = "PASSED" if result else "FAILED"
                 print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
                 results.append((filename, i + 1, "Backtracking", exec_time, status, num_nodes, num_edges, num_colors))
-    
+
     return results
 
 def delete_pycache(directory):

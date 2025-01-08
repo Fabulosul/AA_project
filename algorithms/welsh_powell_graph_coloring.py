@@ -7,49 +7,63 @@ def has_edge(graph, u, v):
     '''Verifică dacă există o muchie între nodurile "u" și "v"'''
     return v in graph[u]
 
-def neighbors_same_color(graph, node_color, u, color):
-    '''Verifică dacă nodul "u" are vecini colorați cu aceeași culoare cu cea dată "color"'''
-    for neighbour in graph[u]:
-        if node_color[neighbour] == color:
-            return True
-    return False
+def calculate_degrees(graph):
+    '''Calculează gradul fiecărui nod'''
+    return [(u, len(graph[u])) for u in range(len(graph))]
 
-def graph_coloring(graph):
-    '''Colorează un graf folosind algoritmul Welsh-Powell'''
+def get_uncolored_highest_degree(degree_list, node_color):
+    '''Returnează nodul necolorat cu cel mai mare grad'''
+    for u, degree in degree_list:
+        if node_color[u] == -1:
+            return u
+    return None
+
+def update_V_prime(graph, current_colored_node, node_color):
+    '''Actualizează setul V' cu noduri necolorate care nu sunt vecine cu nodul curent colorat'''
+    V_prime = []
+    active_color = node_color[current_colored_node]
+    for v in range(len(graph)):
+        if (
+            node_color[v] == -1 and  # Nod necolorat
+            not has_edge(graph, current_colored_node, v) and  # Nu este adiacent nodului curent
+            all(node_color[neighbor] != active_color for neighbor in graph[v])  # Niciun vecin nu are culoarea curentă
+        ):
+            V_prime.append(v)
+    return V_prime
+
+def graph_coloring_welsh_powell(graph):
+    '''Colorează graful utilizând algoritmul Welsh-Powell'''
     nr_nodes = len(graph)
+    node_color = [-1] * nr_nodes  # -1 indică noduri necolorate
+    color_set = []  # Lista de culori utilizate
 
-    # Vector pentru culorile nodurilor
-    node_color = [-1] * nr_nodes
+    # Step 1: Calculează gradele și sortează descrescător
+    degrees = calculate_degrees(graph)
+    degrees.sort(key=lambda x: x[1], reverse=True)
 
-    # Calculează gradele și le asociază cu nodurile
-    node_degrees = [None] * nr_nodes
-    for u in range(nr_nodes):
-        node_degrees[u] = (u, len(graph[u]))
-    
-    # Sortează nodurile descrescător după grad
-    node_degrees.sort(key=lambda x: x[1], reverse=True)
-    
-    # Vector pentru culorile existente
-    colors = [None] * nr_nodes
-    for i in range(nr_nodes):
-        # Inițializează "culorile" cu care vom colora
-        colors[i] = i
+    # Step 4: Repetă până toate nodurile sunt colorate
+    while any(color == -1 for color in node_color):
+        # Selectează o nouă culoare din paleta de culori
+        active_color = len(color_set)
+        color_set.append(active_color)
 
-    # Atribuie culorile
-    # Parcurge nodurile în ordinea descrescătoare a gradelor pana cand vectorul e gol
-    while node_degrees:
-        u, _ = node_degrees.pop(0)
+        # Step 2: Găsește nodul necolorat cu grad maxim
+        highest_degree_node = get_uncolored_highest_degree(degrees, node_color)
 
-        # Daca nodul a fost deja colorat, trecem la următorul
-        if node_color[u] != -1:
-            continue
+        # Step 3: Colorează nodul selectat și actualizează V'
+        while highest_degree_node is not None:
+            node_color[highest_degree_node] = active_color
+            V_prime = update_V_prime(graph, highest_degree_node, node_color)
 
-        color = colors.pop(0)
-        node_color[u] = color
+            # Selectează următorul nod necolorat din V' pentru aceeași culoare
+            next_node = None
+            max_degree = -1
+            for v in V_prime:
+                current_degree = len(graph[v])
+                if current_degree > max_degree:
+                    max_degree = current_degree
+                    next_node = v
 
-        for v, _ in node_degrees:
-            # Dacă nodul nu are culoare și nu este vecin cu nodul curent și nici cu alte noduri colorate cu aceeași culoare
-            # atunci îi atribuim culoarea curenta
-            if not has_edge(graph, u, v) and node_color[v] == -1 and not neighbors_same_color(graph, node_color, v, color):
-                node_color[v] = color
-    return True
+            highest_degree_node = next_node
+
+    return len(color_set), node_color
