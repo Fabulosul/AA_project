@@ -19,3 +19,10 @@ Deletes the generated test and result files.
 ```bash
 python3 make.py clean
 ```
+
+### Plots
+Creates the plots for each algorithm and a common plot with the
+overlapped graphs
+```bash
+python3 make.py plots
+```
