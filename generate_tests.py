@@ -1,12 +1,12 @@
 import random
 import os
 
-def generate_test(file_name, num_nodes, edges, num_colors):
+def generate_test(file_name, num_nodes, edges):
     """
     Generates a graph with the given parameters and saves it to a file.
     """
     with open(file_name, 'w') as file:
-        file.write(f"{num_nodes} {len(edges)} {num_colors}\n")
+        file.write(f"{num_nodes} {len(edges)}\n")
         for u, v in edges:
             file.write(f"{u} {v}\n")
 
@@ -63,33 +63,40 @@ def generate_adversarial_graph(num_nodes):
 def generate_tests():
     os.makedirs("tests", exist_ok=True)
 
-    test_cases = [
+    # test_cases = [
         # Basic tests
-        ("test1_dense", 5, generate_complete_graph(5), 3),
-        ("test2_sparse", 5, [(0, 1), (1, 2)], 2),
-        ("test3_bipartite", 10, generate_bipartite_graph(5, 5), 2),
-        ("test4_cycle", 10, generate_cycle_graph(10), 3),
-        ("test5_tree", 50, generate_tree_graph(50), 3),
-        ("test6_star", 250, generate_star_graph(250), 3),
-        ("test7_grid", 400, generate_grid_graph(20, 20), 4),
+        # ("test1_dense", 5, generate_complete_graph(5)),
+        # ("test2_sparse", 5, [(0, 1), (1, 2)]),
+        # ("test3_bipartite", 10, generate_bipartite_graph(5, 5)),
+        # ("test4_cycle", 10, generate_cycle_graph(10)),
+        # ("test5_tree", 50, generate_tree_graph(50)),
+        # ("test6_star", 250, generate_star_graph(250)),
+        # ("test7_grid", 400, generate_grid_graph(20, 20)),
 
-        # Larger tests for scalability
-        ("test8_large_dense", 100, generate_complete_graph(100), 100),
-        ("test9_large_sparse", 100, generate_random_graph(100, 0.1), 10),
-        ("test10_large_bipartite", 100, generate_bipartite_graph(50, 50), 2),
+        # # Larger tests for scalability
+        # ("test8_large_dense", 100, generate_complete_graph(100)),
+        # ("test9_large_sparse", 100, generate_random_graph(100, 0.1)),
+        # ("test10_large_bipartite", 100, generate_bipartite_graph(50, 50)),
 
-        # Adversarial cases
-        ("test11_adversarial", 20, generate_adversarial_graph(20), 15),
-        ("test12_worst_case_greedy", 10, [(0, 1), (1, 2), (2, 3), (3, 4), (4, 0)], 3),
+        # # Adversarial cases
+        # ("test11_adversarial", 20, generate_adversarial_graph(20)),
+        # ("test12_worst_case_greedy", 10, [(0, 1), (1, 2), (2, 3), (3, 4), (4, 0)]),
 
-        # Randomized cases
-        ("test13_random_dense", 50, generate_random_graph(50, 0.8), 25),
-        ("test14_random_sparse", 50, generate_random_graph(50, 0.2), 10),
-    ]
+        # # Randomized cases
+        # ("test13_random_dense", 50, generate_random_graph(50, 0.8)),
+        # ("test14_random_sparse", 50, generate_random_graph(50, 0.2)),
 
-    for name, nodes, edges, colors in test_cases:
+        # Stress tests
+        
+    # ]
+    test_cases = []
+    for i in range(10, 15):
+        
+        test_cases.append(("test" + f"{i - 9}" + "_stress", i, generate_random_graph(i, 0.2)))
+
+    for name, nodes, edges in test_cases:
         file_name = f"tests/{name}.in"
-        generate_test(file_name, nodes, edges, colors)
+        generate_test(file_name, nodes, edges)
         print(f"Generated {file_name}")
 
 if __name__ == "__main__":

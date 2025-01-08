@@ -12,7 +12,6 @@ init(autoreset=True)
 def read_graph_from_file(filename, add_edge_func):
     '''Reads graph data from a file and returns a list of graphs and number of colors'''
     graphs = []
-    num_colors = None
     num_nodes = None
     num_edges = None
     with open(filename, 'r') as file:
@@ -23,7 +22,7 @@ def read_graph_from_file(filename, add_edge_func):
                 i += 1
                 continue  # Skip comments or empty lines
 
-            num_nodes, num_edges, num_colors = map(int, lines[i].split())
+            num_nodes, num_edges = map(int, lines[i].split())
             graph = [[] for _ in range(num_nodes)]
             i += 1
             for _ in range(num_edges):
@@ -31,17 +30,14 @@ def read_graph_from_file(filename, add_edge_func):
                 add_edge_func(graph, u, v)
                 i += 1
             graphs.append(graph)
-    return graphs, num_colors, num_nodes, num_edges
+    return graphs, num_nodes, num_edges
 
-def measure_time(graph_coloring_function, graph, nr_nodes=None):
+def measure_time(graph_coloring_function, graph):
     '''Measures the execution time of the graph_coloring function'''
     start_time = time.time()
-    if nr_nodes is not None:
-        result = graph_coloring_function(graph, nr_nodes)
-    else:
-        result = graph_coloring_function(graph)
+    nr_colors, node_colors = graph_coloring_function(graph)
     end_time = time.time()
-    return end_time - start_time, result
+    return end_time - start_time, nr_colors
 
 def process_test_directory(directory):
     '''Processes all test files in a given directory'''
@@ -52,31 +48,31 @@ def process_test_directory(directory):
             print(f"\nProcessing file: {Fore.CYAN}{filepath}{Style.RESET_ALL}")
             
             # Welsh-Powell
-            graphs_wp, num_colors, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_wp)
+            graphs_wp, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_wp)
             for i, graph in enumerate(graphs_wp):
                 print(f"  Running {Fore.YELLOW}Welsh-Powell{Style.RESET_ALL} graph coloring on graph {i + 1}")
                 exec_time, result = measure_time(wp_coloring, graph)
                 status = "PASSED" if result else "FAILED"
                 print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
-                results.append((filename, i + 1, "Welsh-Powell", exec_time, status, num_nodes, num_edges, num_colors))
+                results.append((filename, i + 1, "Welsh-Powell", exec_time, status, num_nodes, num_edges))
             
             # Greedy
-            graphs_greedy, num_colors, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_greedy)
+            graphs_greedy, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_greedy)
             for i, graph in enumerate(graphs_greedy):
                 print(f"  Running {Fore.YELLOW}Greedy{Style.RESET_ALL} Algorithm on graph {i + 1}")
-                exec_time, result = measure_time(greedy_coloring, graph, len(graph))
+                exec_time, result = measure_time(greedy_coloring, graph)
                 status = "PASSED" if result else "FAILED"
                 print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
-                results.append((filename, i + 1, "Greedy", exec_time, status, num_nodes, num_edges, num_colors))
+                results.append((filename, i + 1, "Greedy", exec_time, status, num_nodes, num_edges))
             
             # Backtracking
-            graphs_backtracking, num_colors, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_backtracking)
+            graphs_backtracking, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_backtracking)
             for i, graph in enumerate(graphs_backtracking):
                 print(f"  Running {Fore.YELLOW}Backtracking{Style.RESET_ALL} graph coloring on graph {i + 1}")
-                exec_time, result = measure_time(backtracking_coloring, graph, num_colors)
+                exec_time, result = measure_time(backtracking_coloring, graph)
                 status = "PASSED" if result else "FAILED"
                 print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
-                results.append((filename, i + 1, "Backtracking", exec_time, status, num_nodes, num_edges, num_colors))
+                results.append((filename, i + 1, "Backtracking", exec_time, status, num_nodes, num_edges))
 
     return results
 
@@ -88,8 +84,15 @@ def delete_pycache(directory):
         print(f"Deleted {pycache_path}")
 
 def save_results_by_algorithm(results, output_directory):
-    '''Saves the results into separate files for each algorithm'''
+    '''Saves the results into separate files for each algorithm, including chromatic number.'''
     os.makedirs(output_directory, exist_ok=True)
+
+    # Extract chromatic numbers from backtracking results
+    chromatic_numbers = {}
+    for result in results:
+        filename, graph_num, algorithm, exec_time, status, num_nodes, num_edges, num_colors = result
+        if algorithm == "Backtracking":
+            chromatic_numbers[(filename, graph_num)] = num_colors
 
     def extract_numeric_part(filename):
         '''Extracts the numeric part of a filename for correct sorting'''
@@ -105,6 +108,7 @@ def save_results_by_algorithm(results, output_directory):
 
     for result in results:
         filename, graph_num, algorithm, exec_time, status, num_nodes, num_edges, num_colors = result
+        chromatic_number = chromatic_numbers.get((filename, graph_num), "N/A")  # Default to "N/A" if not available
         entry = {
             "filename": filename,
             "graph_num": graph_num,
@@ -112,6 +116,7 @@ def save_results_by_algorithm(results, output_directory):
             "num_edges": num_edges,
             "num_edges_and_nodes": num_nodes + num_edges,
             "num_colors": num_colors,
+            "chromatic_number": chromatic_number,
             "execution_time": exec_time,
             "status": status
         }
@@ -121,19 +126,21 @@ def save_results_by_algorithm(results, output_directory):
         # Sort data by filename (numeric order) and then by graph number
         data.sort(key=lambda x: (extract_numeric_part(x['filename']), x['graph_num']))
         
-        new_dir = output_directory + "/" + f"{algorithm}"
+        new_dir = os.path.join(output_directory, algorithm)
         os.makedirs(new_dir, exist_ok=True)
         output_file = os.path.join(new_dir, f"{algorithm}_results.txt")
 
         with open(output_file, "w") as file:
-            # file.write(f"Results for {algorithm} Algorithm:\n")
-            file.write("Filename,Nodes,Edges,Nodes + Edges,Colors,Execution Time (s),Status\n")
-            # file.write("-" * 90 + "\n")
-
+            file.write("Filename,Nodes,Edges,Nodes + Edges,Colors,Chromatic Number,Execution Time (s),Status\n")
             for entry in data:
-                file.write(f"{entry['filename']},{entry['num_nodes']},{entry['num_edges']},{entry['num_edges_and_nodes']},{entry['num_colors']},{entry['execution_time']:.12f},{entry['status']}\n")
+                file.write(
+                    f"{entry['filename']},{entry['num_nodes']},{entry['num_edges']},"
+                    f"{entry['num_edges_and_nodes']},{entry['num_colors']},{entry['chromatic_number']},"
+                    f"{entry['execution_time']:.12f},{entry['status']}\n"
+                )
 
         print(f"Results written to {output_file}")
+
 
 
 if __name__ == "__main__":
@@ -165,9 +172,8 @@ if __name__ == "__main__":
         summary_file = os.path.join(results_directory, "results_summary.txt")
         with open(summary_file, "w") as output_file:
             output_file.write("Filename,Algorithm,Nodes,Edges,Colors,Execution Time (s),Status\n")
-            output_file.write("-" * 90 + "\n")
-            for filename, test_num, algorithm, exec_time, status, num_nodes, num_edges, num_colors in results:
-                output_file.write(f"{filename} | {algorithm} | {num_nodes} | {num_edges} | {num_colors} | {exec_time:.12f} | {status}\n")
+            for filename, test_num, algorithm, exec_time, status, num_nodes, num_edges in results:
+                output_file.write(f"{filename} | {algorithm} | {num_nodes} | {num_edges} | {exec_time:.12f} | {status}\n")
         print(f"\nResults summary saved to {summary_file}")
 
         # Save organized results by algorithm
