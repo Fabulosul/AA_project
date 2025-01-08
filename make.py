@@ -1,4 +1,4 @@
-from graph_scripts.make_graphs import Plots, all_paths
+from graph_scripts.make_graphs import Plots, all_graphs, common_graph_path
 import subprocess
 import shutil
 import os
@@ -14,8 +14,9 @@ def run_tests():
     subprocess.run(["python3", "run_tests.py"])
 
 def generate_plots():
-    plots = Plots(all_paths)
+    plots = Plots(all_graphs, common_graph_path)
     plots.make_graphs()
+    plots.make_overlapped_graphs()
 
 def clean():
     '''Deletes the tests and results directories'''
