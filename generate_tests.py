@@ -70,8 +70,8 @@ def generate_tests():
         ("test3_bipartite", 10, generate_bipartite_graph(5, 5), 2),
         ("test4_cycle", 10, generate_cycle_graph(10), 3),
         ("test5_tree", 50, generate_tree_graph(50), 3),
-        ("test6_star", 50, generate_star_graph(50), 2),
-        ("test7_grid", 16, generate_grid_graph(4, 4), 4),
+        ("test6_star", 250, generate_star_graph(250), 3),
+        ("test7_grid", 400, generate_grid_graph(20, 20), 4),
 
         # Larger tests for scalability
         ("test8_large_dense", 100, generate_complete_graph(100), 100),

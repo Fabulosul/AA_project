@@ -110,6 +110,7 @@ def save_results_by_algorithm(results, output_directory):
             "graph_num": graph_num,
             "num_nodes": num_nodes,
             "num_edges": num_edges,
+            "num_edges_and_nodes": num_nodes + num_edges,
             "num_colors": num_colors,
             "execution_time": exec_time,
             "status": status
@@ -120,15 +121,17 @@ def save_results_by_algorithm(results, output_directory):
         # Sort data by filename (numeric order) and then by graph number
         data.sort(key=lambda x: (extract_numeric_part(x['filename']), x['graph_num']))
         
-        output_file = os.path.join(output_directory, f"{algorithm}_results.txt")
+        new_dir = output_directory + "/" + f"{algorithm}"
+        os.makedirs(new_dir, exist_ok=True)
+        output_file = os.path.join(new_dir, f"{algorithm}_results.txt")
 
         with open(output_file, "w") as file:
-            file.write(f"Results for {algorithm} Algorithm:\n")
-            file.write("Filename | Nodes | Edges | Colors | Execution Time (s) | Status\n")
-            file.write("-" * 90 + "\n")
+            # file.write(f"Results for {algorithm} Algorithm:\n")
+            file.write("Filename,Nodes,Edges,Nodes + Edges,Colors,Execution Time (s),Status\n")
+            # file.write("-" * 90 + "\n")
 
             for entry in data:
-                file.write(f"{entry['filename']} | {entry['num_nodes']} | {entry['num_edges']} | {entry['num_colors']} | {entry['execution_time']:.12f} | {entry['status']}\n")
+                file.write(f"{entry['filename']},{entry['num_nodes']},{entry['num_edges']},{entry['num_edges_and_nodes']},{entry['num_colors']},{entry['execution_time']:.12f},{entry['status']}\n")
 
         print(f"Results written to {output_file}")
 
@@ -161,7 +164,7 @@ if __name__ == "__main__":
         # Save sorted results to a summary file
         summary_file = os.path.join(results_directory, "results_summary.txt")
         with open(summary_file, "w") as output_file:
-            output_file.write("Filename | Algorithm | Nodes | Edges | Colors | Execution Time (s) | Status\n")
+            output_file.write("Filename,Algorithm,Nodes,Edges,Colors,Execution Time (s),Status\n")
             output_file.write("-" * 90 + "\n")
             for filename, test_num, algorithm, exec_time, status, num_nodes, num_edges, num_colors in results:
                 output_file.write(f"{filename} | {algorithm} | {num_nodes} | {num_edges} | {num_colors} | {exec_time:.12f} | {status}\n")

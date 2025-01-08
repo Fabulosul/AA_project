@@ -1,3 +1,4 @@
+from graph_scripts.make_graphs import Plots, all_paths
 import subprocess
 import shutil
 import os
@@ -11,6 +12,10 @@ def generate_tests():
 def run_tests():
     '''Runs the run_tests.py script to execute the tests and save results'''
     subprocess.run(["python3", "run_tests.py"])
+
+def generate_plots():
+    plots = Plots(all_paths)
+    plots.make_graphs()
 
 def clean():
     '''Deletes the tests and results directories'''
@@ -29,6 +34,8 @@ if __name__ == "__main__":
             generate_tests()
         elif command == "run":
             run_tests()
+        elif command == "plots":
+            generate_plots()
         elif command == "clean":
             clean()
         else:
