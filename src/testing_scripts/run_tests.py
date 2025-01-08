@@ -142,12 +142,11 @@ def save_results_by_algorithm(results, output_directory):
         print(f"Results written to {output_file}")
 
 
-
-if __name__ == "__main__":
-    # Delete __pycache__ directories
+def run_main():
+# Delete __pycache__ directories
     delete_pycache('algorithms')
 
-    test_directory = "tests"  # Directory containing test files
+    test_directory = "../tests"  # Directory containing test files
     results_directory = "results"  # Directory to save results
 
     if not os.path.isdir(test_directory):

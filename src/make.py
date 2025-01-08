@@ -1,4 +1,6 @@
 from graph_scripts.make_graphs import Plots, all_graphs, common_graph_path
+from testing_scripts.generate_tests import generate_main
+from testing_scripts.run_tests import run_main
 import subprocess
 import shutil
 import os
@@ -7,11 +9,11 @@ import sys
 def generate_tests():
     '''Runs the generate_tests.py script to generate test files'''
     print("Generating test files...")
-    subprocess.run(["python3", "generate_tests.py"])
+    generate_main()
 
 def run_tests():
     '''Runs the run_tests.py script to execute the tests and save results'''
-    subprocess.run(["python3", "run_tests.py"])
+    run_main()
 
 def generate_plots():
     plots = Plots(all_graphs, common_graph_path)
@@ -20,7 +22,7 @@ def generate_plots():
 
 def clean():
     '''Deletes the tests and results directories'''
-    directories = ["tests", "results"]
+    directories = ["../tests", "results"]
     for directory in directories:
         if os.path.exists(directory):
             shutil.rmtree(directory)

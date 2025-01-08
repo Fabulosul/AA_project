@@ -61,7 +61,8 @@ def generate_adversarial_graph(num_nodes):
     return edges
 
 def generate_tests():
-    os.makedirs("tests", exist_ok=True)
+    pass
+    # os.makedirs("../tests", exist_ok=True)
 
     # test_cases = [
         # Basic tests
@@ -89,15 +90,18 @@ def generate_tests():
         # Stress tests
         
     # ]
+def generate_main():
+    os.makedirs("../tests", exist_ok=True)
+
     test_cases = []
     for i in range(1, 11):
         
         #test_cases.append(("test" + f"{i}" + "_stress", i, generate_random_graph(i, 0.2)))
         test_cases.append(("test" + f"{i}" + "_stress", i, generate_complete_graph(i)))
     for name, nodes, edges in test_cases:
-        file_name = f"tests/{name}.in"
+        file_name = f"../tests/{name}.in"
         generate_test(file_name, nodes, edges)
         print(f"Generated {file_name}")
 
-if __name__ == "__main__":
+
     generate_tests()
