@@ -1,5 +1,5 @@
 from graph_scripts.make_graphs import Plots, all_graphs, common_graph_path
-from testing_scripts.generate_tests import generate_main
+from testing_scripts.generate_tests import generate_all_tests
 from testing_scripts.run_tests import run_main
 import subprocess
 import shutil
@@ -9,16 +9,19 @@ import sys
 def generate_tests():
     '''Runs the generate_tests.py script to generate test files'''
     print("Generating test files...")
-    generate_main()
+    generate_all_tests()
+    delete_pycache()
 
 def run_tests():
     '''Runs the run_tests.py script to execute the tests and save results'''
     run_main()
+    delete_pycache()
 
 def generate_plots():
     plots = Plots(all_graphs, common_graph_path)
     plots.make_graphs()
     plots.make_overlapped_graphs()
+    delete_pycache()
 
 def clean():
     '''Deletes the tests and results directories'''
@@ -29,6 +32,15 @@ def clean():
             print(f"Deleted {directory} directory.")
         else:
             print(f"{directory} directory does not exist.")
+    delete_pycache()
+
+def delete_pycache():
+    '''Deletes __pycache__ directories from all subdirectories'''
+    for root, dirs, files in os.walk("."):
+        if "__pycache__" in dirs:
+            pycache_path = os.path.join(root, "__pycache__")
+            shutil.rmtree(pycache_path)
+            print(f"Deleted {pycache_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

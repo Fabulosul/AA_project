@@ -1,107 +1,70 @@
 import random
 import os
+import networkx as nx
+import numpy
 
 def generate_test(file_name, num_nodes, edges):
     """
-    Generates a graph with the given parameters and saves it to a file.
+    Saves a graph with the given parameters to a file.
     """
     with open(file_name, 'w') as file:
         file.write(f"{num_nodes} {len(edges)}\n")
         for u, v in edges:
             file.write(f"{u} {v}\n")
 
+def generate_random_graph(nr_nodes, edge_probability):
+    """
+    Generates an Erdős-Rényi graph.
+
+    Parameters:
+        num_nodes (int): Number of nodes in the graph.
+        edge_probability (float): Probability of creating an edge between any two nodes.
+
+    Returns:
+        list[tuple[int, int]]: List of edges in the graph.
+    """
+    graph = nx.erdos_renyi_graph(nr_nodes, edge_probability)
+    return list(graph.edges())
+
 def generate_complete_graph(num_nodes):
-    edges = [(i, j) for i in range(num_nodes) for j in range(i + 1, num_nodes)]
-    return edges
+    """
+    Generates a complete graph.
 
-def generate_bipartite_graph(set1_size, set2_size):
-    edges = [(i, j) for i in range(set1_size) for j in range(set1_size, set1_size + set2_size)]
-    return edges
+    Parameters:
+        num_nodes (int): Number of nodes in the graph.
 
-def generate_cycle_graph(num_nodes):
-    edges = [(i, (i + 1) % num_nodes) for i in range(num_nodes)]
-    return edges
+    Returns:
+        list[tuple[int, int]]: List of edges in the graph.
+    """
+    graph = nx.complete_graph(num_nodes)
+    return list(graph.edges())
 
-def generate_tree_graph(num_nodes):
-    edges = [(i, random.randint(0, i - 1)) for i in range(1, num_nodes)]
-    return edges
-
-def generate_star_graph(num_nodes):
-    edges = [(0, i) for i in range(1, num_nodes)]
-    return edges
-
-def generate_grid_graph(rows, cols):
-    edges = []
-    for r in range(rows):
-        for c in range(cols):
-            node = r * cols + c
-            if c < cols - 1:
-                edges.append((node, node + 1))  # Right
-            if r < rows - 1:
-                edges.append((node, node + cols))  # Down
-    return edges
-
-def generate_random_graph(num_nodes, density):
-    max_edges = num_nodes * (num_nodes - 1) // 2
-    num_edges = int(max_edges * density)
-    edges = set()
-    while len(edges) < num_edges:
-        u, v = random.sample(range(num_nodes), 2)
-        if u > v:
-            u, v = v, u
-        edges.add((u, v))
-    return list(edges)
-
-def generate_adversarial_graph(num_nodes):
-    edges = []
-    for i in range(num_nodes):
-        for j in range(i + 1, num_nodes):
-            if abs(i - j) != 1:  # Skip consecutive nodes
-                edges.append((i, j))
-    return edges
-
-def generate_tests():
-    pass
-    # os.makedirs("../tests", exist_ok=True)
-
-    # test_cases = [
-        # Basic tests
-        # ("test1_dense", 5, generate_complete_graph(5)),
-        # ("test2_sparse", 5, [(0, 1), (1, 2)]),
-        # ("test3_bipartite", 10, generate_bipartite_graph(5, 5)),
-        # ("test4_cycle", 10, generate_cycle_graph(10)),
-        # ("test5_tree", 50, generate_tree_graph(50)),
-        # ("test6_star", 250, generate_star_graph(250)),
-        # ("test7_grid", 400, generate_grid_graph(20, 20)),
-
-        # # Larger tests for scalability
-        # ("test8_large_dense", 100, generate_complete_graph(100)),
-        # ("test9_large_sparse", 100, generate_random_graph(100, 0.1)),
-        # ("test10_large_bipartite", 100, generate_bipartite_graph(50, 50)),
-
-        # # Adversarial cases
-        # ("test11_adversarial", 20, generate_adversarial_graph(20)),
-        # ("test12_worst_case_greedy", 10, [(0, 1), (1, 2), (2, 3), (3, 4), (4, 0)]),
-
-        # # Randomized cases
-        # ("test13_random_dense", 50, generate_random_graph(50, 0.8)),
-        # ("test14_random_sparse", 50, generate_random_graph(50, 0.2)),
-
-        # Stress tests
-        
-    # ]
-def generate_main():
-    os.makedirs("../tests", exist_ok=True)
+def generate_all_tests():
+    """
+    Generates test cases and saves them in the 'tests' folder.
+    """
+    os.makedirs("../tests/random_graphs", exist_ok=True)
+    os.makedirs("../tests/complete_graphs", exist_ok=True)
 
     test_cases = []
-    for i in range(1, 11):
-        
-        #test_cases.append(("test" + f"{i}" + "_stress", i, generate_random_graph(i, 0.2)))
-        test_cases.append(("test" + f"{i}" + "_stress", i, generate_complete_graph(i)))
+    # Random graphs
+    for i in range(1, 15):
+        probabilities = numpy.linspace(0, 0.3, 100)
+        for j, probability in enumerate(probabilities, start=1):
+            test_cases.append((f"random_graphs/test{(i-1)*1000 + j}", i, generate_random_graph(i, probability)))
+                          
+
+
+    # Complete graphs
+    for i in range(1, 10):
+        test_cases.append((f"complete_graphs/test{i}", i, generate_complete_graph(i)))
+
+
+
     for name, nodes, edges in test_cases:
         file_name = f"../tests/{name}.in"
         generate_test(file_name, nodes, edges)
         print(f"Generated {file_name}")
 
-
-    generate_tests()
+if __name__ == "__main__":
+    generate_all_tests()

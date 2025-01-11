@@ -1,6 +1,6 @@
 import time
 import os
-import shutil
+import subprocess
 from colorama import init, Fore, Style
 from algorithms.welsh_powell_graph_coloring import add_edge as add_edge_wp, graph_coloring_welsh_powell as wp_coloring
 from algorithms.greedy_graph_coloring import add_edge as add_edge_greedy, greedy_coloring as greedy_coloring
@@ -32,56 +32,54 @@ def read_graph_from_file(filename, add_edge_func):
             graphs.append(graph)
     return graphs, num_nodes, num_edges
 
-def measure_time(graph_coloring_function, graph):
+def measure_time(graph_coloring_function, graph, nr_runs=10):
     '''Measures the execution time of the graph_coloring function'''
-    start_time = time.time()
-    nr_colors, node_colors = graph_coloring_function(graph)
-    end_time = time.time()
-    return end_time - start_time, nr_colors
+    times = []
+    for _ in range(nr_runs):
+        start_time = time.perf_counter()
+        nr_colors, node_colors = graph_coloring_function(graph)
+        end_time = time.perf_counter()
+        times.append(end_time - start_time)
+    average_time = sum(times) / len(times)
+    return average_time, nr_colors
 
 def process_test_directory(directory):
-    '''Processes all test files in a given directory'''
+    '''Processes all test files in a given directory and its subdirectories'''
     results = []
-    for filename in os.listdir(directory):
-        if filename.endswith(".in"):  # Only process .in files
-            filepath = os.path.join(directory, filename)
-            print(f"\nProcessing file: {Fore.CYAN}{filepath}{Style.RESET_ALL}")
-            
-            # Welsh-Powell
-            graphs_wp, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_wp)
-            for i, graph in enumerate(graphs_wp):
-                print(f"  Running {Fore.YELLOW}Welsh-Powell{Style.RESET_ALL} graph coloring on graph {i + 1}")
-                exec_time, result = measure_time(wp_coloring, graph)
-                status = "PASSED" if result else "FAILED"
-                print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
-                results.append((filename, i + 1, "Welsh-Powell", exec_time, status, num_nodes, num_edges, result))
-            
-            # Greedy
-            graphs_greedy, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_greedy)
-            for i, graph in enumerate(graphs_greedy):
-                print(f"  Running {Fore.YELLOW}Greedy{Style.RESET_ALL} Algorithm on graph {i + 1}")
-                exec_time, result = measure_time(greedy_coloring, graph)
-                status = "PASSED" if result else "FAILED"
-                print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
-                results.append((filename, i + 1, "Greedy", exec_time, status, num_nodes, num_edges, result))
-            
-            # Backtracking
-            graphs_backtracking, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_backtracking)
-            for i, graph in enumerate(graphs_backtracking):
-                print(f"  Running {Fore.YELLOW}Backtracking{Style.RESET_ALL} graph coloring on graph {i + 1}")
-                exec_time, result = measure_time(backtracking_coloring, graph)
-                status = "PASSED" if result else "FAILED"
-                print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
-                results.append((filename, i + 1, "Backtracking", exec_time, status, num_nodes, num_edges, result))
+    for root, _, files in os.walk(directory):
+        for filename in files:
+            if filename.endswith(".in"):  # Only process .in files
+                filepath = os.path.join(root, filename)
+                print(f"\nProcessing file: {Fore.CYAN}{filepath}{Style.RESET_ALL}")
+                
+                # Welsh-Powell
+                graphs_wp, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_wp)
+                for i, graph in enumerate(graphs_wp):
+                    print(f"  Running {Fore.YELLOW}Welsh-Powell{Style.RESET_ALL} graph coloring on graph {i + 1}")
+                    exec_time, result = measure_time(wp_coloring, graph)
+                    status = "PASSED" if result else "FAILED"
+                    print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
+                    results.append((filename, i + 1, "Welsh-Powell", exec_time, status, num_nodes, num_edges, result))
+                
+                # Greedy
+                graphs_greedy, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_greedy)
+                for i, graph in enumerate(graphs_greedy):
+                    print(f"  Running {Fore.YELLOW}Greedy{Style.RESET_ALL} Algorithm on graph {i + 1}")
+                    exec_time, result = measure_time(greedy_coloring, graph)
+                    status = "PASSED" if result else "FAILED"
+                    print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
+                    results.append((filename, i + 1, "Greedy", exec_time, status, num_nodes, num_edges, result))
+                
+                # Backtracking
+                graphs_backtracking, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_backtracking)
+                for i, graph in enumerate(graphs_backtracking):
+                    print(f"  Running {Fore.YELLOW}Backtracking{Style.RESET_ALL} graph coloring on graph {i + 1}")
+                    exec_time, result = measure_time(backtracking_coloring, graph)
+                    status = "PASSED" if result else "FAILED"
+                    print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
+                    results.append((filename, i + 1, "Backtracking", exec_time, status, num_nodes, num_edges, result))
 
     return results
-
-def delete_pycache(directory):
-    '''Deletes the __pycache__ directory if it exists'''
-    pycache_path = os.path.join(directory, '__pycache__')
-    if os.path.exists(pycache_path) and os.path.isdir(pycache_path):
-        shutil.rmtree(pycache_path)
-        print(f"Deleted {pycache_path}")
 
 def save_results_by_algorithm(results, output_directory):
     '''Saves the results into separate files for each algorithm, including chromatic number.'''
@@ -141,39 +139,42 @@ def save_results_by_algorithm(results, output_directory):
 
         print(f"Results written to {output_file}")
 
-
 def run_main():
-# Delete __pycache__ directories
-    delete_pycache('algorithms')
-
     test_directory = "../tests"  # Directory containing test files
     results_directory = "results"  # Directory to save results
 
     if not os.path.isdir(test_directory):
         print(f"Directory {test_directory} not found!")
     else:
-        # Process all test files and collect results
-        results = process_test_directory(test_directory)
+        for subdir in os.listdir(test_directory):
+            subdir_path = os.path.join(test_directory, subdir)
+            if os.path.isdir(subdir_path):
+                # Process all test files in the subdirectory and collect results
+                results = process_test_directory(subdir_path)
 
-        # Create results directory if it doesn't exist
-        os.makedirs(results_directory, exist_ok=True)
+                # Create results directory for the subdirectory if it doesn't exist
+                subdir_results_directory = os.path.join(results_directory, subdir)
+                os.makedirs(subdir_results_directory, exist_ok=True)
 
-        # Sort results by filename (numeric order) and then by graph number
-        def extract_numeric_part(filename):
-            '''Extracts the numeric part of a filename for correct sorting'''
-            import re
-            match = re.search(r'\d+', filename)
-            return int(match.group()) if match else float('inf')
+                # Sort results by filename (numeric order) and then by graph number
+                def extract_numeric_part(filename):
+                    '''Extracts the numeric part of a filename for correct sorting'''
+                    import re
+                    match = re.search(r'\d+', filename)
+                    return int(match.group()) if match else float('inf')
 
-        results.sort(key=lambda x: (extract_numeric_part(x[0]), x[1]))
+                results.sort(key=lambda x: (extract_numeric_part(x[0]), x[1]))
 
-        # Save sorted results to a summary file
-        summary_file = os.path.join(results_directory, "results_summary.txt")
-        with open(summary_file, "w") as output_file:
-            output_file.write("Filename,Algorithm,Nodes,Edges,Execution Time (s),Status,Colors\n")
-            for filename, test_num, algorithm, exec_time, status, num_nodes, num_edges, colors in results:
-                output_file.write(f"{filename} | {algorithm} | {num_nodes} | {num_edges} | {exec_time:.12f} | {status} | {colors}\n")
-        print(f"\nResults summary saved to {summary_file}")
+                # Save sorted results to a summary file
+                summary_file = os.path.join(subdir_results_directory, "results_summary.txt")
+                with open(summary_file, "w") as output_file:
+                    output_file.write("Filename,Algorithm,Nodes,Edges,Execution Time (s),Status,Colors\n")
+                    for filename, test_num, algorithm, exec_time, status, num_nodes, num_edges, colors in results:
+                        output_file.write(f"{filename} | {algorithm} | {num_nodes} | {num_edges} | {exec_time:.12f} | {status} | {colors}\n")
+                print(f"\nResults summary saved to {summary_file}")
 
-        # Save organized results by algorithm
-        save_results_by_algorithm(results, results_directory)
+                # Save organized results by algorithm
+                save_results_by_algorithm(results, subdir_results_directory)
+
+if __name__ == "__main__":
+    run_main()
