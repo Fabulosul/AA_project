@@ -1,35 +1,52 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import os
 
 # List of .csv and directory path where all the data will be saved
 # Example of object (as a tuple): (file_path, out_dir_path, graph_colour, graph_label)
-all_graphs = []
 common_graph_path = "results/Overlaped.png"
 
-# Just append your files here
-file_path_one = "results/Backtracking/Backtracking_results.txt"
-out_dir_one = "results/Backtracking/Backtracking_graph.png"
-all_graphs.append((file_path_one, out_dir_one, "green", "Backtracking"))
 
-file_path_two = "results/Greedy/Greedy_results.txt"
-out_dir_two = "results/Greedy/Greedy_graph.png"
-all_graphs.append((file_path_two, out_dir_two, "blue", "Greedy"))
+root = "results/"
+bkt = "/Backtracking/Backtracking_results.txt"
+welsh = "/Welsh-Powell/Welsh-Powell_results.txt"
+greedy = "/Greedy/Greedy_results.txt"
 
-file_path_three = "results/Welsh-Powell/Welsh-Powell_results.txt"
-out_dir_three = "results/Welsh-Powell/Welsh-Powell_graph.png"
-all_graphs.append((file_path_three, out_dir_three, "orange", "Welsh-Powell"))
-# End of appending objects
+out_bkt = "/Backtracking/Backtracking_graph.png"
+out_greedy = "/Greedy/Greedy_graph.png"
+out_welsh = "/Welsh-Powell/Welsh-Powell_graph.png"
+
+overlapped_graphic = "/Overlapped.png"
 
 class Plots():
-    def __init__(self, all_graphs, common_dir_path):
+    def __init__(self, top_directory):
+        all_graphs = []
+
+        a, directories, _ = next(os.walk(top_directory))
+        for directory in directories:
+            common_dir_path = root + directory + overlapped_graphic
+            pathBkt = root + directory + bkt
+            outPathBkt = root + directory + out_bkt
+            bktTuple = (pathBkt, outPathBkt, "green", "Backtracking")
+
+            pathWelsh = root + directory + welsh
+            outPathWelsh = root + directory + out_welsh
+            welshTupple = (pathWelsh, outPathWelsh, "blue", "Greedy")
+
+            pathGreedy = root + directory + greedy
+            outPathGreedy = root + directory + out_greedy
+            greedyTuple = (pathGreedy, outPathGreedy, "orange", "Welsh-Powell")
+
+            all_graphs.append((bktTuple, welshTupple, greedyTuple, common_dir_path))
+
         self.all_graphs = all_graphs
-        self.common_dir_path = common_dir_path
-                
+
     def make_graphs(self):
-        for path in self.all_graphs:
-            self.make_single_graph(path)
+        for graphs in self.all_graphs:
+            self.make_single_graph(graphs[0])
+            self.make_single_graph(graphs[1])
+            self.make_single_graph(graphs[2])
             
     def make_single_graph(self, graph):
         file_path = graph[0]
@@ -52,18 +69,21 @@ class Plots():
         plt.savefig(dir_path, format='png', dpi=300)
     
     def make_overlapped_graphs(self):
-        plt.figure(figsize=(10, 6))
-        plt.title("Graph Coloring Complexity: Execution Time vs Nodes")
-        plt.xlabel("Number of Nodes + Edgess")
-        plt.ylabel("Execution Time (seconds)")
-        plt.grid(True)
         
-        for path in self.all_graphs:
-            self.add_to_plot(path)
+        for graphs in self.all_graphs:
+            plt.figure(figsize=(10, 6))
+            plt.title("Graph Coloring Complexity: Execution Time vs Nodes")
+            plt.xlabel("Number of Nodes + Edgess")
+            plt.ylabel("Execution Time (seconds)")
+            plt.grid(True)
+            
+            self.add_to_plot(graphs[0])
+            self.add_to_plot(graphs[1])
+            self.add_to_plot(graphs[2])
         
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig(self.common_dir_path, format='png', dpi=300)
+            plt.legend()
+            plt.tight_layout()
+            plt.savefig(graphs[4], format='png', dpi=300)
     
     def add_to_plot(self, path):
         file_path = path[0]

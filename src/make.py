@@ -1,4 +1,4 @@
-from graph_scripts.make_graphs import Plots, all_graphs, common_graph_path
+from graph_scripts.make_graphs import Plots, root
 from testing_scripts.generate_tests import generate_all_tests
 from testing_scripts.run_tests import run_main
 import subprocess
@@ -18,7 +18,7 @@ def run_tests():
     delete_pycache()
 
 def generate_plots():
-    plots = Plots(all_graphs, common_graph_path)
+    plots = Plots(root)
     plots.make_graphs()
     plots.make_overlapped_graphs()
     delete_pycache()
