@@ -83,7 +83,7 @@ class Plots():
         
             plt.legend()
             plt.tight_layout()
-            plt.savefig(graphs[4], format='png', dpi=300)
+            plt.savefig(graphs[3], format='png', dpi=300)
     
     def add_to_plot(self, path):
         file_path = path[0]
