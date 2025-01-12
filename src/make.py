@@ -21,6 +21,7 @@ def generate_plots():
     plots = Plots(root)
     plots.make_graphs()
     plots.make_overlapped_graphs()
+    plots.make_welsh_and_greedy()
     delete_pycache()
 
 def clean():

@@ -18,6 +18,7 @@ out_greedy = "/Greedy/Greedy_graph.png"
 out_welsh = "/Welsh-Powell/Welsh-Powell_graph.png"
 
 overlapped_graphic = "/Overlapped.png"
+overlapped_welsh_greedy = "/Welsh_VS_Greedy.png"
 
 class Plots():
     def __init__(self, top_directory):
@@ -26,6 +27,7 @@ class Plots():
         a, directories, _ = next(os.walk(top_directory))
         for directory in directories:
             common_dir_path = root + directory + overlapped_graphic
+            welsh_vs_greedy_dir_path = root + directory + overlapped_welsh_greedy
             pathBkt = root + directory + bkt
             outPathBkt = root + directory + out_bkt
             bktTuple = (pathBkt, outPathBkt, "green", "Backtracking")
@@ -38,7 +40,7 @@ class Plots():
             outPathGreedy = root + directory + out_greedy
             greedyTuple = (pathGreedy, outPathGreedy, "orange", "Greedy")
 
-            all_graphs.append((bktTuple, welshTupple, greedyTuple, common_dir_path))
+            all_graphs.append((bktTuple, welshTupple, greedyTuple, common_dir_path, welsh_vs_greedy_dir_path))
 
         self.all_graphs = all_graphs
 
@@ -67,6 +69,23 @@ class Plots():
         plt.tight_layout()
 
         plt.savefig(dir_path, format='png', dpi=300)
+        
+    def make_welsh_and_greedy(self):
+        
+        for graphs in self.all_graphs:
+            plt.figure(figsize=(10, 6))
+            plt.title("Graph Coloring Complexity: Execution Time vs Nodes")
+            plt.xlabel("Number of Nodes + Edgess")
+            plt.ylabel("Execution Time (seconds)")
+            plt.grid(True)
+            
+            self.add_to_plot(graphs[1])
+            self.add_to_plot(graphs[2])
+        
+            plt.legend()
+            plt.tight_layout()
+            plt.savefig(graphs[4], format='png', dpi=300)
+            plt.close()
     
     def make_overlapped_graphs(self):
         
