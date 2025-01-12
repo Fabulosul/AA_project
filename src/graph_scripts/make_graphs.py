@@ -32,11 +32,11 @@ class Plots():
 
             pathWelsh = root + directory + welsh
             outPathWelsh = root + directory + out_welsh
-            welshTupple = (pathWelsh, outPathWelsh, "blue", "Greedy")
+            welshTupple = (pathWelsh, outPathWelsh, "blue", "Welsh-Powell")
 
             pathGreedy = root + directory + greedy
             outPathGreedy = root + directory + out_greedy
-            greedyTuple = (pathGreedy, outPathGreedy, "orange", "Welsh-Powell")
+            greedyTuple = (pathGreedy, outPathGreedy, "orange", "Greedy")
 
             all_graphs.append((bktTuple, welshTupple, greedyTuple, common_dir_path))
 
@@ -84,6 +84,7 @@ class Plots():
             plt.legend()
             plt.tight_layout()
             plt.savefig(graphs[3], format='png', dpi=300)
+            plt.close()
     
     def add_to_plot(self, path):
         file_path = path[0]

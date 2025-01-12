@@ -46,40 +46,45 @@ def measure_time(graph_coloring_function, graph, nr_runs=10):
 def process_test_directory(directory):
     '''Processes all test files in a given directory and its subdirectories'''
     results = []
+    chromatic_numbers = {}
+
     for root, _, files in os.walk(directory):
         for filename in files:
             if filename.endswith(".in"):  # Only process .in files
                 filepath = os.path.join(root, filename)
                 print(f"\nProcessing file: {Fore.CYAN}{filepath}{Style.RESET_ALL}")
                 
-                # Welsh-Powell
-                graphs_wp, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_wp)
-                for i, graph in enumerate(graphs_wp):
-                    print(f"  Running {Fore.YELLOW}Welsh-Powell{Style.RESET_ALL} graph coloring on graph {i + 1}")
-                    exec_time, result = measure_time(wp_coloring, graph)
-                    status = "PASSED" if result else "FAILED"
-                    print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
-                    results.append((filename, i + 1, "Welsh-Powell", exec_time, status, num_nodes, num_edges, result))
-                
-                # Greedy
-                graphs_greedy, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_greedy)
-                for i, graph in enumerate(graphs_greedy):
-                    print(f"  Running {Fore.YELLOW}Greedy{Style.RESET_ALL} Algorithm on graph {i + 1}")
-                    exec_time, result = measure_time(greedy_coloring, graph)
-                    status = "PASSED" if result else "FAILED"
-                    print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
-                    results.append((filename, i + 1, "Greedy", exec_time, status, num_nodes, num_edges, result))
-                
-                # Backtracking
+                # Backtracking (calculate chromatic number first)
                 graphs_backtracking, num_nodes, num_edges = read_graph_from_file(filepath, add_edge_backtracking)
                 for i, graph in enumerate(graphs_backtracking):
                     print(f"  Running {Fore.YELLOW}Backtracking{Style.RESET_ALL} graph coloring on graph {i + 1}")
-                    exec_time, result = measure_time(backtracking_coloring, graph)
-                    status = "PASSED" if result else "FAILED"
-                    print(f"  Test {Fore.GREEN if result else Fore.RED}{status}{Style.RESET_ALL} after {Fore.MAGENTA}{exec_time:.12f}{Style.RESET_ALL} seconds.")
-                    results.append((filename, i + 1, "Backtracking", exec_time, status, num_nodes, num_edges, result))
+                    exec_time, chromatic_number = measure_time(backtracking_coloring, graph)
+                    print(f"  Chromatic Number: {Fore.MAGENTA}{chromatic_number}{Style.RESET_ALL} after {exec_time:.12f} seconds.")
+                    chromatic_numbers[(filename, i + 1)] = chromatic_number
+                    results.append((filename, i + 1, "Backtracking", exec_time, "PASSED", num_nodes, num_edges, chromatic_number))
+
+                # Welsh-Powell
+                graphs_wp, _, _ = read_graph_from_file(filepath, add_edge_wp)
+                for i, graph in enumerate(graphs_wp):
+                    print(f"  Running {Fore.YELLOW}Welsh-Powell{Style.RESET_ALL} graph coloring on graph {i + 1}")
+                    exec_time, num_colors = measure_time(wp_coloring, graph)
+                    chromatic_number = chromatic_numbers.get((filename, i + 1), float('inf'))
+                    status = "PASSED" if num_colors == chromatic_number else "FAILED"
+                    print(f"  Test {Fore.GREEN if status == 'PASSED' else Fore.RED}{status}{Style.RESET_ALL} after {exec_time:.12f} seconds.")
+                    results.append((filename, i + 1, "Welsh-Powell", exec_time, status, num_nodes, num_edges, num_colors))
+                
+                # Greedy
+                graphs_greedy, _, _ = read_graph_from_file(filepath, add_edge_greedy)
+                for i, graph in enumerate(graphs_greedy):
+                    print(f"  Running {Fore.YELLOW}Greedy{Style.RESET_ALL} Algorithm on graph {i + 1}")
+                    exec_time, num_colors = measure_time(greedy_coloring, graph)
+                    chromatic_number = chromatic_numbers.get((filename, i + 1), float('inf'))
+                    status = "PASSED" if num_colors == chromatic_number else "FAILED"
+                    print(f"  Test {Fore.GREEN if status == 'PASSED' else Fore.RED}{status}{Style.RESET_ALL} after {exec_time:.12f} seconds.")
+                    results.append((filename, i + 1, "Greedy", exec_time, status, num_nodes, num_edges, num_colors))
 
     return results
+
 
 def save_results_by_algorithm(results, output_directory):
     '''Saves the results into separate files for each algorithm, including chromatic number.'''
