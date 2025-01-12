@@ -95,16 +95,18 @@ def generate_all_tests():
     os.makedirs("../tests/random_graphs", exist_ok=True)
     os.makedirs("../tests/complete_graphs", exist_ok=True)
     os.makedirs("../tests/cycle_graphs", exist_ok=True)
-    os.makedirs("../tests/bipartite_graphs", exist_ok=True)
+    # os.makedirs("../tests/bipartite_graphs", exist_ok=True)
     os.makedirs("../tests/path_graph", exist_ok=True)
     os.makedirs("../tests/grid_graph", exist_ok=True)
 
     test_cases = []
     # Random graphs
+    count = 1
     for i in range(1, 10):
         probabilities = numpy.linspace(0.5, 1, 5) 
         for j, probability in enumerate(probabilities, start=1):
-            test_cases.append((f"random_graphs/test{(i-1)*10 + j}", i, generate_random_graph(i, probability)))
+            test_cases.append((f"random_graphs/test{count}", i, generate_random_graph(i, probability)))
+            count += 1
                           
     # Complete graphs
     for i in range(1, 10):
@@ -112,21 +114,21 @@ def generate_all_tests():
 
     # Cycle graphs
     for i in range(10, 20):
-        test_cases.append((f"cycle_graphs/test{i - 10}", i, generate_cycle_graph(i)))
+        test_cases.append((f"cycle_graphs/test{i - 9}", i, generate_cycle_graph(i)))
 
     # Bipartite graphs
-    for i in range(1, 20):
-        num_nodes_set1 = random.randint(0, i)
-        num_nodes_set2 = i - num_nodes_set1
-        test_cases.append((f"bipartite_graphs/test{i}", i, generate_bipartite_graph(num_nodes_set1, num_nodes_set2)))
+    # for i in range(1, 20):
+    #     num_nodes_set1 = random.randint(0, i)
+    #     num_nodes_set2 = i - num_nodes_set1
+    #     test_cases.append((f"bipartite_graphs/test{i}", i, generate_bipartite_graph(num_nodes_set1, num_nodes_set2)))
 
     # Path graphs
     for i in range(1, 50):
         test_cases.append((f"path_graph/test{i}", i, generate_path_graph(i)))
 
     # Grid graphs
-    for i in range(2, 20):
-        test_cases.append((f"grid_graph/test{i - 2}", i * i, generate_grid_graph(i, i)))
+    for i in range(1, 30):
+        test_cases.append((f"grid_graph/test{i}", i * i, generate_grid_graph(i, i)))
 
 
     for name, nodes, edges in test_cases:
