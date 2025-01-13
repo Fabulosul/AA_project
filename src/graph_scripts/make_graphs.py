@@ -69,6 +69,7 @@ class Plots():
         plt.tight_layout()
 
         plt.savefig(dir_path, format='png', dpi=300)
+        plt.close()
         
     def make_welsh_and_greedy(self):
         

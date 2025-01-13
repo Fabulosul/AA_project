@@ -1,8 +1,8 @@
 # Adauga o muchie intre nodurile u si v
-def add_edge(neighbours, u, v):
-    neighbours[u].append(v)
-    neighbours[v].append(u)
-    return neighbours
+def add_edge(graph, u, v):
+    graph[u].append(v)
+    graph[v].append(u)
+    return graph
 
 def greedy_coloring(graph):
     # Initializam un vector ce retine culoarea finala a fiecarui nod
@@ -17,7 +17,7 @@ def greedy_coloring(graph):
     available_colors = [True] * nr_nodes
 
     # Procesam toate nodurile
-    for u in range(1, nr_nodes):
+    for u in range(nr_nodes):
         # Marcam culorile vecinilor ca indisponibile
         for i in graph[u]:
             if colored_graph[i] != -1:
@@ -34,9 +34,7 @@ def greedy_coloring(graph):
         colored_graph[u] = color_index
 
         # Resetam vectorul de culori disponibile pentru urmatoarea iteratie
-        for i in graph[u]:
-            if colored_graph[i] != -1:
-                available_colors[colored_graph[i]] = True
+        available_colors = [True] * nr_nodes
 
     # Calculam numarul de culori utilizate
     nr_colors = max(colored_graph) + 1
