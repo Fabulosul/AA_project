@@ -104,7 +104,7 @@ def generate_all_tests():
 
     # Spare graphs
     count = 1
-    for i in range(1, 12):
+    for i in range(1, 11):
         probabilities = numpy.linspace(0.1, 0.4, 5) 
         for j, probability in enumerate(probabilities, start=1):
             test_cases.append((f"spare_graphs/test{count}", i, generate_random_graph(i, probability)))
@@ -112,14 +112,14 @@ def generate_all_tests():
 
     # Dense graphs
     count = 1
-    for i in range(1, 12):
+    for i in range(1, 11):
         probabilities = numpy.linspace(0.7, 1, 5) 
         for j, probability in enumerate(probabilities, start=1):
             test_cases.append((f"dense_graphs/test{count}", i, generate_random_graph(i, probability)))
             count += 1
                           
     # Complete graphs
-    for i in range(1, 12):
+    for i in range(1, 11):
         test_cases.append((f"complete_graphs/test{i}", i, generate_complete_graph(i)))
 
     # Cycle graphs
@@ -134,11 +134,11 @@ def generate_all_tests():
 
     # Path graphs
     for i in range(1, 81):
-        test_cases.append((f"path_graphs/test{i}", i, generate_path_graph(i)))
+        test_cases.append((f"path_graph/test{i}", i, generate_path_graph(i)))
 
     # Grid graphs
     for i in range(1, 31):
-        test_cases.append((f"grid_graphs/test{i}", i * i, generate_grid_graph(i, i)))
+        test_cases.append((f"grid_graph/test{i}", i * i, generate_grid_graph(i, i)))
 
 
     for name, nodes, edges in test_cases:

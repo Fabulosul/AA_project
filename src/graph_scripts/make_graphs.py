@@ -55,14 +55,14 @@ class Plots():
         dir_path = graph[1]
 
         df = pd.read_csv(file_path)
-        columns_needed = ["Nodes + Edges", "Execution Time (s)"]
+        columns_needed = ["Nodes", "Execution Time (s)"]
         data = df[columns_needed]
         
         plt.figure(figsize=(10, 6))
-        sns.lineplot(data=data, x="Nodes + Edges", y="Execution Time (s)", marker="o", label="Execution Time")
+        sns.lineplot(data=data, x="Nodes", y="Execution Time (s)", marker="o", label="Execution Time")
 
         plt.title("Graph Coloring Complexity: Execution Time vs Nodes")
-        plt.xlabel("Number of Nodes + Edges")
+        plt.xlabel("Number of Nodes")
         plt.ylabel("Execution Time (seconds)")
         plt.grid(True)
         plt.legend()
@@ -76,7 +76,7 @@ class Plots():
         for graphs in self.all_graphs:
             plt.figure(figsize=(10, 6))
             plt.title("Graph Coloring Complexity: Execution Time vs Nodes")
-            plt.xlabel("Number of Nodes + Edgess")
+            plt.xlabel("Number of Nodes")
             plt.ylabel("Execution Time (seconds)")
             plt.grid(True)
             
@@ -93,7 +93,7 @@ class Plots():
         for graphs in self.all_graphs:
             plt.figure(figsize=(10, 6))
             plt.title("Graph Coloring Complexity: Execution Time vs Nodes")
-            plt.xlabel("Number of Nodes + Edgess")
+            plt.xlabel("Number of Nodes")
             plt.ylabel("Execution Time (seconds)")
             plt.grid(True)
             
@@ -112,11 +112,11 @@ class Plots():
         my_label = path[3]
 
         df = pd.read_csv(file_path)
-        columns_needed = ["Nodes + Edges", "Execution Time (s)"]
+        columns_needed = ["Nodes", "Execution Time (s)"]
         #columns_needed = ["Edges", "Execution Time (s)"]
         data = df[columns_needed]
 
-        sns.lineplot(data=data, x="Nodes + Edges", y="Execution Time (s)",
+        sns.lineplot(data=data, x="Nodes", y="Execution Time (s)",
                      marker="o", color=my_color, label=my_label)
         #sns.lineplot(data=data, x="Edges", y="Execution Time (s)",
         #             marker="o", color=my_color, label=my_label)
