@@ -123,22 +123,22 @@ def generate_all_tests():
         test_cases.append((f"complete_graphs/test{i}", i, generate_complete_graph(i)))
 
     # Cycle graphs
-    for i in range(1, 80):
-        test_cases.append((f"cycle_graphs/test{i - 9}", i, generate_cycle_graph(i)))
+    for i in range(1, 81):
+        test_cases.append((f"cycle_graphs/test{i}", i, generate_cycle_graph(i)))
 
     # Bipartite graphs
-    for i in range(1, 50):
+    for i in range(1, 51):
         num_nodes_set1 = random.randint(0, i)
         num_nodes_set2 = i - num_nodes_set1
         test_cases.append((f"bipartite_graphs/test{i}", i, generate_bipartite_graph(num_nodes_set1, num_nodes_set2)))
 
     # Path graphs
-    for i in range(1, 80):
-        test_cases.append((f"path_graph/test{i}", i, generate_path_graph(i)))
+    for i in range(1, 81):
+        test_cases.append((f"path_graphs/test{i}", i, generate_path_graph(i)))
 
     # Grid graphs
-    for i in range(1, 30):
-        test_cases.append((f"grid_graph/test{i}", i * i, generate_grid_graph(i, i)))
+    for i in range(1, 31):
+        test_cases.append((f"grid_graphs/test{i}", i * i, generate_grid_graph(i, i)))
 
 
     for name, nodes, edges in test_cases:
