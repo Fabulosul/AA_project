@@ -22,7 +22,8 @@ def graph_coloring_welsh_powell(graph):
         if node_color[node] == -1:  # Nod necolorat
             current_color = len(color_set)  # Atribuie o nouă culoare
             color_set.append(current_color)
-            
+            node_color[node] = current_color
+
             # Colorează nodurile ce pot fi colorate cu aceeași culoare
             for v in degrees:
                 if node_color[v] == -1 and all(node_color[neighbor] != current_color for neighbor in graph[v]):
