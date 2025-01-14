@@ -20,7 +20,7 @@ plots:
 
 clean:
 	@echo "Cleaning test and results directories..."
-	@cd ./src && if [ -d "./tests" ]; then rm -r ./tests && echo "Deleted ./tests directory."; else echo "./tests directory does not exist."; fi
+	if [ -d "./tests" ]; then rm -r ./tests && echo "Deleted ./tests directory."; else echo "./tests directory does not exist."; fi
 	@cd ./src && if [ -d "./results" ]; then rm -r ./results && echo "Deleted ./results directory."; else echo "./results directory does not exist."; fi
 	@$(MAKE) clean_pycache
 
